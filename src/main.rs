@@ -1,3 +1,12 @@
+use itertools::Itertools;
+
 fn main() {
-    println!("Hello, world!");
+    let (width, height) = (200, 100);
+    println!("P3\n{} {}\n255", width, height);
+    for (j, i) in (0..height).rev().cartesian_product(0..width) {
+        let r = ((i as f32 / width as f32) * 255.0) as i32;
+        let g = ((j as f32 / height as f32) * 255.0) as i32;
+        let b = (0.2 * 255.0) as i32;
+        println!("{} {} {}", r, g, b);
+    }
 }
