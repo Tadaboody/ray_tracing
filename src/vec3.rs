@@ -26,6 +26,9 @@ impl Vec3 {
     pub fn unit(&self) -> Vec3 {
         *self / self.length()
     }
+    pub fn dot(&self, other: &Vec3) -> f32 {
+        self.e.iter().zip(other.e.iter()).map(|(a, b)| a * b).sum()
+    }
 }
 
 use std::ops::*;
