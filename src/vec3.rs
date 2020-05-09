@@ -1,4 +1,4 @@
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub struct Vec3 {
     e: [f32; 3],
 }
@@ -22,6 +22,9 @@ impl Vec3 {
     pub fn length(&self) -> f32 {
         let rooted = self.length_squared();
         rooted * rooted
+    }
+    pub fn unit(&self) -> Vec3 {
+        *self / self.length()
     }
 }
 
