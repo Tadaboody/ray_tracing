@@ -1,6 +1,7 @@
 mod ray;
 mod vec3;
 
+use indicatif::ProgressBar;
 use itertools::Itertools;
 use ray::Ray;
 use vec3::Vec3;
@@ -34,7 +35,10 @@ fn main() {
     let vertical = Vec3::new(0.0, 2.0, 0.0);
 
     println!("P3\n{} {}\n255", width, height);
-    for (j, i) in (0..height).rev().cartesian_product(0..width) {
+    let pb = ProgressBar::new(height * width);
+    pb.set_draw_delta((height * width) / 100);
+    let iter = (0..height).rev().cartesian_product(0..width);
+    for (j, i) in pb.wrap_iter(iter) {
         let u = i as f32 / width as f32;
         let v = j as f32 / height as f32;
         let r = Ray {
@@ -43,4 +47,5 @@ fn main() {
         };
         println!("{}", color(r) * 255.99);
     }
+    pb.finish() // Fixed in indicatif 14.0
 }
