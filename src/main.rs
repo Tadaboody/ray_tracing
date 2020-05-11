@@ -6,18 +6,26 @@ use itertools::Itertools;
 use ray::Ray;
 use vec3::Vec3;
 
-fn hit_sphere(center: &Vec3, radius: f32, _ray: &Ray) -> bool {
+fn hit_sphere(center: &Vec3, radius: f32, _ray: &Ray) -> Option<Vec3> {
     let oc = _ray.origin - *center;
     let a = _ray.direction.dot(&_ray.direction);
     let b = 2.0 * oc.dot(&_ray.direction);
     let c = oc.dot(&oc) - radius * radius;
-    let desc = b * b - 4.0 * a * c;
-    desc > 0.0
+    let discriminant = b * b - 4.0 * a * c;
+    if discriminant < 0.0 {
+        return None;
+    }
+    let t = -b - discriminant.sqrt() / (2.0 * a);
+
+    if t < 0.0 {
+        return None;
+    }
+    Some(_ray.at(t).unit() - *center)
 }
 
 fn color(r: Ray) -> Vec3 {
-    if hit_sphere(&Vec3::new(0.0, 0.0, -1.0), 0.5, &r) {
-        Vec3::new(1.0, 0.0, 0.0)
+    if let Some(normal) = hit_sphere(&Vec3::new(0.0, 0.0, -1.0), 0.5, &r) {
+        0.5 * (normal.unit() + Vec3::new(1.0, 1.0, 1.0))
     } else {
         let unit_direction = r.direction.unit();
         let t = 0.5 * (unit_direction.y() + 1.0);
@@ -29,10 +37,10 @@ fn color(r: Ray) -> Vec3 {
 
 fn main() {
     let (width, height) = (200, 100);
-    let origin = Vec3::new(0.0, 0.0, 0.0);
     let lower_left = Vec3::new(-2.0, -1.0, -1.0);
     let horizontal = Vec3::new(4.0, 0.0, 0.0);
     let vertical = Vec3::new(0.0, 2.0, 0.0);
+    let origin = Vec3::new(0.0, 0.0, 0.0);
 
     println!("P3\n{} {}\n255", width, height);
     let pb = ProgressBar::new(height * width);

@@ -185,7 +185,13 @@ impl IndexMut<usize> for Vec3 {
 }
 impl std::fmt::Display for Vec3 {
     fn fmt(&self, fmt: &mut std::fmt::Formatter<'_>) -> std::result::Result<(), std::fmt::Error> {
-        write!(fmt, "{} {} {}", self.x(), self.y(), self.z())?;
+        write!(
+            fmt,
+            "{} {} {}",
+            self.x() as i32,
+            self.y() as i32,
+            self.z() as i32
+        )?;
         Ok(())
     }
 }
