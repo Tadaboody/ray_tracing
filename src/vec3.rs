@@ -29,6 +29,9 @@ impl Vec3 {
     pub fn dot(&self, other: &Vec3) -> f32 {
         self.e.iter().zip(other.e.iter()).map(|(a, b)| a * b).sum()
     }
+    pub fn int(&self) -> Vec3 {
+        Vec3::new(self.x().floor(), self.y().floor(), self.z().floor())
+    }
 }
 
 use std::ops::*;
@@ -183,15 +186,10 @@ impl IndexMut<usize> for Vec3 {
         &mut self.e[i]
     }
 }
+
 impl std::fmt::Display for Vec3 {
     fn fmt(&self, fmt: &mut std::fmt::Formatter<'_>) -> std::result::Result<(), std::fmt::Error> {
-        write!(
-            fmt,
-            "{} {} {}",
-            self.x() as i32,
-            self.y() as i32,
-            self.z() as i32
-        )?;
+        write!(fmt, "{} {} {}", self.x(), self.y(), self.z(),)?;
         Ok(())
     }
 }

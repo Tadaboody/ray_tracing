@@ -20,12 +20,15 @@ fn hit_sphere(center: &Vec3, radius: f32, _ray: &Ray) -> Option<Vec3> {
     if t < 0.0 {
         return None;
     }
-    Some(_ray.at(t).unit() - *center)
+    Some(_ray.at(t) - *center)
 }
 
 fn color(r: Ray) -> Vec3 {
+    let red = Vec3::new(1., 0., 0.);
+    let blue = Vec3::new(0.0, 0.0, 1.0);
     if let Some(normal) = hit_sphere(&Vec3::new(0.0, 0.0, -1.0), 0.5, &r) {
-        0.5 * (normal.unit() + Vec3::new(1.0, 1.0, 1.0))
+        let t = normal.unit().dot(&r.direction.unit());
+        t * red + (1. - t) * blue
     } else {
         let unit_direction = r.direction.unit();
         let t = 0.5 * (unit_direction.y() + 1.0);
@@ -38,8 +41,8 @@ fn color(r: Ray) -> Vec3 {
 fn main() {
     let (width, height) = (200, 100);
     let lower_left = Vec3::new(-2.0, -1.0, -1.0);
-    let horizontal = Vec3::new(4.0, 0.0, 0.0);
-    let vertical = Vec3::new(0.0, 2.0, 0.0);
+    let horizontal_length = Vec3::new(4.0, 0.0, 0.0);
+    let vertical_length = Vec3::new(0.0, 2.0, 0.0);
     let origin = Vec3::new(0.0, 0.0, 0.0);
 
     println!("P3\n{} {}\n255", width, height);
@@ -51,9 +54,9 @@ fn main() {
         let v = j as f32 / height as f32;
         let r = Ray {
             origin: origin,
-            direction: lower_left + u * horizontal + v * vertical,
+            direction: lower_left + u * horizontal_length + v * vertical_length,
         };
-        println!("{}", color(r) * 255.99);
+        println!("{}", (color(r) * 255.99).int());
     }
     pb.finish() // Fixed in indicatif 14.0
 }
