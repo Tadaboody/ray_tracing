@@ -27,7 +27,7 @@ impl Vec3 {
         *self / self.length()
     }
     pub fn dot(&self, other: &Vec3) -> f32 {
-        self.e.iter().zip(other.e.iter()).map(|(a, b)| a * b).sum()
+        self.e[0] * other.e[0] +self.e[1] * other.e[1] +self.e[2] * other.e[2]  
     }
     pub fn int(&self) -> Vec3 {
         Vec3::new(self.x().floor(), self.y().floor(), self.z().floor())

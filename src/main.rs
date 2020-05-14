@@ -1,26 +1,22 @@
+mod hit;
 mod ray;
+mod sphere;
 mod vec3;
 
+use hit::Hittable;
 use indicatif::ProgressBar;
 use itertools::Itertools;
 use ray::Ray;
+use sphere::Sphere;
 use vec3::Vec3;
 
 fn hit_sphere(center: &Vec3, radius: f32, _ray: &Ray) -> Option<Vec3> {
-    let oc = _ray.origin - *center;
-    let a = _ray.direction.dot(&_ray.direction);
-    let b = 2.0 * oc.dot(&_ray.direction);
-    let c = oc.dot(&oc) - radius * radius;
-    let discriminant = b * b - 4.0 * a * c;
-    if discriminant < 0.0 {
-        return None;
+    Sphere {
+        center: *center,
+        radius: radius,
     }
-    let t = -b - discriminant.sqrt() / (2.0 * a);
-
-    if t < 0.0 {
-        return None;
-    }
-    Some(_ray.at(t) - *center)
+    .hit(_ray)
+    .map(|hit| hit.normal)
 }
 
 fn color(r: Ray) -> Vec3 {
