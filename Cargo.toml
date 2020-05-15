@@ -9,3 +9,4 @@ edition = "2018"
 [dependencies]
 itertools = "0.9.0"
 indicatif = "0.14.0"
+noisy_float = "0.1.12"

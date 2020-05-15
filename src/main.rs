@@ -3,28 +3,27 @@ mod ray;
 mod sphere;
 mod vec3;
 
-use hit::Hittable;
+use crate::hit::{Hittable, HittableVec};
+use crate::ray::Ray;
+use crate::sphere::Sphere;
+use crate::vec3::Vec3;
 use indicatif::ProgressBar;
 use itertools::Itertools;
-use ray::Ray;
-use sphere::Sphere;
-use vec3::Vec3;
-
-fn hit_sphere(center: &Vec3, radius: f32, _ray: &Ray) -> Option<Vec3> {
-    Sphere {
-        center: *center,
-        radius: radius,
-    }
-    .hit(_ray)
-    .map(|hit| hit.normal)
-}
 
 fn color(r: Ray) -> Vec3 {
-    let red = Vec3::new(1., 0., 0.);
-    let blue = Vec3::new(0.0, 0.0, 1.0);
-    if let Some(normal) = hit_sphere(&Vec3::new(0.0, 0.0, -1.0), 0.5, &r) {
-        let t = normal.unit().dot(&r.direction.unit());
-        t * red + (1. - t) * blue
+    let spheres: HittableVec = vec![
+        Box::new(Sphere {
+            center: Vec3::new(0., 0., -1.0),
+            radius: 0.5,
+        }),
+        Box::new(Sphere {
+            center: Vec3::new(0., -100.5, -1.0),
+            radius: 100.,
+        }),
+    ];
+
+    if let Some(hit) = spheres.hit(&r) {
+        0.5 * (hit.normal + Vec3::new(1., 1., 1.))
     } else {
         let unit_direction = r.direction.unit();
         let t = 0.5 * (unit_direction.y() + 1.0);

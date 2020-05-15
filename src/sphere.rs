@@ -17,17 +17,17 @@ impl Hittable for Sphere {
         if discriminant < 0.0 {
             return None;
         }
-        let t = -b - discriminant.sqrt() / (2. * a);
+        let dist = -b - discriminant.sqrt() / (2. * a);
 
-        if t < 0.0 {
+        if dist < 0.0 {
             return None;
         }
-        let p = _ray.at(t);
+        let point = _ray.at(dist);
 
         Some(Hit {
-            t: t,
-            point: p,
-            normal: (p - self.center),
+            dist: dist,
+            point: point,
+            normal: (point - self.center),
         })
     }
 }
