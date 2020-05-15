@@ -41,6 +41,9 @@ impl Vec3 {
             rng.gen_range(min, max),
         )
     }
+    pub fn pixel(&self) -> bmp::Pixel {
+        bmp::Pixel::new(self.x() as u8, self.y() as u8, self.z() as u8)
+    }
 }
 
 use std::ops::*;

@@ -1,3 +1,4 @@
+extern crate bmp;
 extern crate rand;
 mod camera;
 mod hit;
@@ -11,8 +12,6 @@ use crate::ray::Ray;
 use crate::sphere::Sphere;
 use crate::vec3::Vec3;
 use indicatif::ProgressBar;
-use itertools::Itertools;
-use rand::prelude::*;
 
 fn random_in_unit_sphere() -> Vec3 {
     loop {
@@ -49,6 +48,7 @@ fn color<T: Hittable>(r: Ray, world: &T, remaining_recursions: u32) -> Vec3 {
 
 fn main() {
     let (width, height) = (200, 100);
+    let mut img = bmp::Image::new(width as u32, height as u32);
     let camera = Camera {
         lower_left: Vec3::new(-2.0, -1.0, -1.0),
         horizontal: Vec3::new(4.0, 0.0, 0.0),
@@ -68,21 +68,20 @@ fn main() {
     let sampling_rate = 100;
     let max_depth = 10;
 
-    println!("P3\n{} {}\n255", width, height);
     let pb = ProgressBar::new(height * width);
     pb.set_draw_delta((height * width) / 100);
-    let iter = (0..height).rev().cartesian_product(0..width);
-    for (j, i) in pb.wrap_iter(iter) {
+    for (x, y) in pb.wrap_iter(img.coordinates()) {
         let mut pixel_color = Vec3::new(0., 0., 0.);
         for _ in 0..sampling_rate {
-            let u = (i as f32 + rand::random::<f32>()) / width as f32;
-            let v = (j as f32 + rand::random::<f32>()) as f32 / height as f32;
+            let u = (x as f32 + rand::random::<f32>()) / width as f32;
+            let v = ((height - y as u64 - 1) as f32 + rand::random::<f32>()) as f32 / height as f32;
             let r = camera.ray(u, v);
             pixel_color += color(r, &world, max_depth);
         }
         pixel_color /= sampling_rate as f32;
-        pixel_color *= 255.;
-        println!("{}", pixel_color.int());
+        pixel_color *= 255.99;
+        img.set_pixel(x, y, pixel_color.pixel());
     }
+    let _ = img.save("res.bmp");
     pb.finish() // Fixed in next indicatif...
 }
