@@ -1,3 +1,4 @@
+extern crate rand;
 mod camera;
 mod hit;
 mod ray;
@@ -11,6 +12,7 @@ use crate::sphere::Sphere;
 use crate::vec3::Vec3;
 use indicatif::ProgressBar;
 use itertools::Itertools;
+use rand::prelude::*;
 
 fn color(r: Ray) -> Vec3 {
     let spheres: HittableVec = vec![
@@ -43,16 +45,23 @@ fn main() {
         vertical: Vec3::new(0.0, 2.0, 0.0),
         origin: Vec3::new(0.0, 0.0, 0.0),
     };
+    let sampling_rate = 100;
 
+    let mut rng = rand::thread_rng();
     println!("P3\n{} {}\n255", width, height);
     let pb = ProgressBar::new(height * width);
     pb.set_draw_delta((height * width) / 100);
     let iter = (0..height).rev().cartesian_product(0..width);
     for (j, i) in pb.wrap_iter(iter) {
-        let u = i as f32 / width as f32;
-        let v = j as f32 / height as f32;
-        let r = camera.ray(u, v);
-        print!("{} ", (color(r) * 255.99).int());
+        let mut pixel_color = Vec3::new(0., 0., 0.);
+        for _ in 0..sampling_rate {
+            let u = (i as f32 + rng.gen::<f32>()) / width as f32;
+            let v = (j as f32 + rng.gen::<f32>()) as f32 / height as f32;
+            let r = camera.ray(u, v);
+            pixel_color += color(r);
+        }
+        pixel_color /= sampling_rate as f32;
+        print!("{} ", (pixel_color * 256.).int());
     }
     pb.finish() // Fixed in next indicatif...
 }
