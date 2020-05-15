@@ -17,7 +17,7 @@ use rand::prelude::*;
 fn random_in_unit_sphere() -> Vec3 {
     loop {
         let p = Vec3::rand(&mut rand::thread_rng(), -1., 1.);
-        if p.length_squared() < 1. {
+        if p.dot(&p) < 1. {
             return p;
         }
     }
@@ -30,15 +30,14 @@ fn color<T: Hittable>(r: Ray, world: &T, remaining_recursions: u32) -> Vec3 {
 
     if let Some(hit) = world.hit(&r) {
         let target = hit.point + hit.normal + random_in_unit_sphere();
-        return 0.5
-            * color(
-                Ray {
-                    origin: hit.point,
-                    direction: target - hit.point,
-                },
-                world,
-                remaining_recursions - 1,
-            );
+        0.5 * color(
+            Ray {
+                origin: hit.point,
+                direction: target - hit.point,
+            },
+            world,
+            remaining_recursions - 1,
+        )
     } else {
         let unit_direction = r.direction.unit();
         let t = 0.5 * (unit_direction.y() + 1.0);
@@ -66,10 +65,9 @@ fn main() {
             radius: 100.,
         }),
     ];
-    let sampling_rate = 10;
+    let sampling_rate = 100;
     let max_depth = 10;
 
-    let mut rng = rand::thread_rng();
     println!("P3\n{} {}\n255", width, height);
     let pb = ProgressBar::new(height * width);
     pb.set_draw_delta((height * width) / 100);
@@ -83,7 +81,8 @@ fn main() {
             pixel_color += color(r, &world, max_depth);
         }
         pixel_color /= sampling_rate as f32;
-        print!("{} ", (pixel_color * 256.).int());
+        pixel_color *= 255.;
+        println!("{}", pixel_color.int());
     }
     pb.finish() // Fixed in next indicatif...
 }
