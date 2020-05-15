@@ -42,7 +42,7 @@ fn color<T: Hittable>(r: Ray, world: &T, remaining_recursions: u32) -> Vec3 {
     } else {
         let unit_direction = r.direction.unit();
         let t = 0.5 * (unit_direction.y() + 1.0);
-        let blue = Vec3::new(0.0, 0.0, 1.0);
+        let blue = Vec3::new(0.5, 0.7, 1.0);
         let white = Vec3::new(1.0, 1.0, 1.0);
         (1.0 - t) * white + t * blue
     }

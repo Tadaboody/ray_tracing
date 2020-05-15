@@ -13,16 +13,16 @@ impl Hittable for Sphere {
         let a = _ray.direction.dot(&_ray.direction);
         let b = 2.0 * oc.dot(&_ray.direction);
         let c = oc.dot(&oc) - self.radius * self.radius;
-        let discriminant = b * b - 4. * a * c;
+        let discriminant = (b * b) - (4. * a * c);
         if discriminant < 0.0 {
             return None;
         }
-        let dist = -b - discriminant.sqrt() / (2. * a);
+        let dist = (-b - discriminant.sqrt()) / (2. * a);
 
         if dist < 0.0 {
             return None;
         }
-        let point = _ray.at(dist);
+        let point = _ray.at(dist) - self.center;
 
         Some(Hit {
             dist: dist,
