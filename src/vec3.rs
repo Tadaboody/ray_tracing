@@ -1,3 +1,5 @@
+use rand::rngs::ThreadRng;
+use rand::Rng;
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub struct Vec3 {
     e: [f32; 3],
@@ -31,6 +33,13 @@ impl Vec3 {
     }
     pub fn int(&self) -> Vec3 {
         Vec3::new(self.x().floor(), self.y().floor(), self.z().floor())
+    }
+    pub fn rand(rng: &mut ThreadRng, min: f32, max: f32) -> Vec3 {
+        Vec3::new(
+            rng.gen_range(min, max),
+            rng.gen_range(min, max),
+            rng.gen_range(min, max),
+        )
     }
 }
 

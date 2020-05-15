@@ -14,20 +14,31 @@ use indicatif::ProgressBar;
 use itertools::Itertools;
 use rand::prelude::*;
 
-fn color(r: Ray) -> Vec3 {
-    let spheres: HittableVec = vec![
-        Box::new(Sphere {
-            center: Vec3::new(0., 0., -1.0),
-            radius: 0.5,
-        }),
-        Box::new(Sphere {
-            center: Vec3::new(0., -100.5, -1.0),
-            radius: 100.,
-        }),
-    ];
+fn random_in_unit_sphere() -> Vec3 {
+    loop {
+        let p = Vec3::rand(&mut rand::thread_rng(), -1., 1.);
+        if p.length_squared() < 1. {
+            return p;
+        }
+    }
+}
 
-    if let Some(hit) = spheres.hit(&r) {
-        0.5 * (hit.normal + Vec3::new(1., 1., 1.))
+fn color<T: Hittable>(r: Ray, world: &T, remaining_recursions: u32) -> Vec3 {
+    if remaining_recursions <= 0 {
+        return Vec3::new(0., 0., 0.);
+    }
+
+    if let Some(hit) = world.hit(&r) {
+        let target = hit.point + hit.normal + random_in_unit_sphere();
+        return 0.5
+            * color(
+                Ray {
+                    origin: hit.point,
+                    direction: target - hit.point,
+                },
+                world,
+                remaining_recursions - 1,
+            );
     } else {
         let unit_direction = r.direction.unit();
         let t = 0.5 * (unit_direction.y() + 1.0);
@@ -45,7 +56,18 @@ fn main() {
         vertical: Vec3::new(0.0, 2.0, 0.0),
         origin: Vec3::new(0.0, 0.0, 0.0),
     };
-    let sampling_rate = 100;
+    let world: HittableVec = vec![
+        Box::new(Sphere {
+            center: Vec3::new(0., 0., -1.0),
+            radius: 0.5,
+        }),
+        Box::new(Sphere {
+            center: Vec3::new(0., -100.5, -1.0),
+            radius: 100.,
+        }),
+    ];
+    let sampling_rate = 10;
+    let max_depth = 10;
 
     let mut rng = rand::thread_rng();
     println!("P3\n{} {}\n255", width, height);
@@ -55,10 +77,10 @@ fn main() {
     for (j, i) in pb.wrap_iter(iter) {
         let mut pixel_color = Vec3::new(0., 0., 0.);
         for _ in 0..sampling_rate {
-            let u = (i as f32 + rng.gen::<f32>()) / width as f32;
-            let v = (j as f32 + rng.gen::<f32>()) as f32 / height as f32;
+            let u = (i as f32 + rand::random::<f32>()) / width as f32;
+            let v = (j as f32 + rand::random::<f32>()) as f32 / height as f32;
             let r = camera.ray(u, v);
-            pixel_color += color(r);
+            pixel_color += color(r, &world, max_depth);
         }
         pixel_color /= sampling_rate as f32;
         print!("{} ", (pixel_color * 256.).int());
