@@ -44,6 +44,9 @@ impl Vec3 {
     pub fn pixel(&self) -> bmp::Pixel {
         bmp::Pixel::new(self.x() as u8, self.y() as u8, self.z() as u8)
     }
+    pub fn map(&self, f: fn(f32) -> f32) -> Vec3 {
+        Vec3::new(f(self.x()), f(self.y()), f(self.z()))
+    }
 }
 
 use std::ops::*;

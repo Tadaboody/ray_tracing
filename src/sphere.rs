@@ -19,7 +19,7 @@ impl Hittable for Sphere {
         }
         let dist = (-b - discriminant.sqrt()) / (2. * a);
 
-        if dist < 0.0 {
+        if dist < 0.1 {
             return None;
         }
         let point = _ray.at(dist) - self.center;

@@ -79,8 +79,9 @@ fn main() {
             pixel_color += color(r, &world, max_depth);
         }
         pixel_color /= sampling_rate as f32;
-        pixel_color *= 255.99;
-        img.set_pixel(x, y, pixel_color.pixel());
+        let mut gamma_corrected = pixel_color.map(|f| f.sqrt());
+        gamma_corrected *= 255.99;
+        img.set_pixel(x, y, gamma_corrected.pixel());
     }
     let _ = img.save("res.bmp");
     pb.finish() // Fixed in next indicatif...
