@@ -60,6 +60,7 @@ fn main() {
 
     let pb = ProgressBar::new(height * width);
     pb.set_draw_delta((height * width) / 100);
+
     for (x, y) in pb.wrap_iter(img.coordinates()) {
         let mut pixel_color = Vec3::new(0., 0., 0.);
         for _ in 0..sampling_rate {
@@ -73,6 +74,6 @@ fn main() {
         gamma_corrected *= 255.99;
         img.set_pixel(x, y, gamma_corrected.pixel());
     }
-    let _ = img.save("res.bmp");
+    let _ = img.save("result.bmp");
     pb.finish() // Fixed in next indicatif...
 }
