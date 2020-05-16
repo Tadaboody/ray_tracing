@@ -10,7 +10,7 @@ use crate::camera::Camera;
 use crate::hit::{Hittable, HittableVec};
 use crate::ray::Ray;
 use crate::sphere::Sphere;
-use crate::vec3::Vec3;
+use crate::vec3::{Color, Vec3};
 use indicatif::ProgressBar;
 
 fn random_in_unit_sphere() -> Vec3 {
@@ -40,9 +40,7 @@ fn color<T: Hittable>(r: Ray, world: &T, remaining_recursions: u32) -> Vec3 {
     } else {
         let unit_direction = r.direction.unit();
         let t = 0.5 * (unit_direction.y() + 1.0);
-        let blue = Vec3::new(0.5, 0.7, 1.0);
-        let white = Vec3::new(1.0, 1.0, 1.0);
-        (1.0 - t) * white + t * blue
+        (1.0 - t) * Color::WHITE + t * Color::SKY_BLUE
     }
 }
 

@@ -4,9 +4,17 @@ use rand::Rng;
 pub struct Vec3 {
     e: [f32; 3],
 }
+pub type Point = Vec3;
+pub type Color = Vec3;
+impl Color {
+    pub const BLACK: Color = Color::new(0., 0., 0.);
+    pub const WHITE: Color = Color::new(1., 1., 1.);
+    pub const GRAY: Color = Color::new(0.5, 0.5, 0.5);
+    pub const SKY_BLUE: Color = Color::new(0.5, 0.7, 1.0);
+}
 
 impl Vec3 {
-    pub fn new(x: f32, y: f32, z: f32) -> Vec3 {
+    pub const fn new(x: f32, y: f32, z: f32) -> Vec3 {
         Vec3 { e: [x, y, z] }
     }
     pub fn x(&self) -> f32 {
