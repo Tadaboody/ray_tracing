@@ -1,14 +1,16 @@
 use crate::hit::{Hit, Hittable};
+use crate::material::Material;
 use crate::ray::Ray;
 use crate::vec3::Vec3;
 
 pub struct Sphere {
     pub center: Vec3,
     pub radius: f32,
+    pub material: Box<dyn Material>,
 }
 
 impl Hittable for Sphere {
-    fn hit(&self, _ray: &Ray) -> Option<Hit> {
+    fn hit(&self, _ray: &Ray) -> Option<(Hit, &dyn Material)> {
         let oc = _ray.origin - self.center;
         let a = _ray.direction.dot(&_ray.direction);
         let b = 2.0 * oc.dot(&_ray.direction);
@@ -24,10 +26,13 @@ impl Hittable for Sphere {
         }
         let point = _ray.at(dist) - self.center;
 
-        Some(Hit {
-            dist: dist,
-            point: point,
-            normal: (point - self.center),
-        })
+        Some((
+            Hit {
+                dist: dist,
+                point: point,
+                normal: (point - self.center),
+            },
+            self.material.as_ref(),
+        ))
     }
 }

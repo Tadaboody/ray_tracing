@@ -2,41 +2,31 @@ extern crate bmp;
 extern crate rand;
 mod camera;
 mod hit;
+mod material;
 mod ray;
 mod sphere;
 mod vec3;
 
 use crate::camera::Camera;
 use crate::hit::{Hittable, HittableVec};
+use crate::material::Lambertian;
 use crate::ray::Ray;
 use crate::sphere::Sphere;
 use crate::vec3::{Color, Vec3};
 use indicatif::ProgressBar;
 
-fn random_in_unit_sphere() -> Vec3 {
-    loop {
-        let p = Vec3::rand(&mut rand::thread_rng(), -1., 1.);
-        if p.dot(&p) < 1. {
-            return p;
-        }
-    }
-}
-
-fn color<T: Hittable>(r: Ray, world: &T, remaining_recursions: u32) -> Vec3 {
+fn color<T: Hittable>(r: Ray, world: &T, remaining_recursions: u32) -> Color {
     if remaining_recursions <= 0 {
-        return Vec3::new(0., 0., 0.);
+        // No light source found, absorb the light!
+        return Color::BLACK;
     }
 
-    if let Some(hit) = world.hit(&r) {
-        let target = hit.point + hit.normal + random_in_unit_sphere();
-        0.5 * color(
-            Ray {
-                origin: hit.point,
-                direction: target - hit.point,
-            },
-            world,
-            remaining_recursions - 1,
-        )
+    if let Some((hit, material)) = world.hit(&r) {
+        if let Some((attenuation, scatter)) = material.scatter(&r, hit) {
+            attenuation * color(scatter, world, remaining_recursions - 1)
+        } else {
+            Vec3::new(0., 0., 0.)
+        }
     } else {
         let unit_direction = r.direction.unit();
         let t = 0.5 * (unit_direction.y() + 1.0);
@@ -57,10 +47,12 @@ fn main() {
         Box::new(Sphere {
             center: Vec3::new(0., 0., -1.0),
             radius: 0.5,
+            material: Box::new(Lambertian(Vec3::new(0.5, 0.5, 0.5))),
         }),
         Box::new(Sphere {
             center: Vec3::new(0., -100.5, -1.0),
             radius: 100.,
+            material: Box::new(Lambertian(Vec3::new(0.5, 0.5, 0.5))),
         }),
     ];
     let sampling_rate = 100;
