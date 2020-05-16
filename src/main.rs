@@ -9,7 +9,7 @@ mod vec3;
 
 use crate::camera::Camera;
 use crate::hit::{Hittable, HittableVec};
-use crate::material::Lambertian;
+use crate::material::{Lambertian, Metal};
 use crate::ray::Ray;
 use crate::sphere::Sphere;
 use crate::vec3::{Color, Vec3};
@@ -47,12 +47,22 @@ fn main() {
         Box::new(Sphere {
             center: Vec3::new(0., 0., -1.0),
             radius: 0.5,
-            material: Box::new(Lambertian(Vec3::new(0.5, 0.5, 0.5))),
+            material: Box::new(Lambertian(Color::new(0.7, 0.3, 0.3))),
         }),
         Box::new(Sphere {
             center: Vec3::new(0., -100.5, -1.0),
             radius: 100.,
-            material: Box::new(Lambertian(Vec3::new(0.5, 0.5, 0.5))),
+            material: Box::new(Lambertian(Color::new(0.8, 0.8, 0.0))),
+        }),
+        Box::new(Sphere {
+            center: Vec3::new(1., 0., -1.),
+            radius: 0.5,
+            material: Box::new(Metal(Color::new(0.8, 0.6, 0.2))),
+        }),
+        Box::new(Sphere {
+            center: Vec3::new(-1., 0., -1.),
+            radius: 0.5,
+            material: Box::new(Metal(Color::YELLOW)),
         }),
     ];
     let sampling_rate = 100;

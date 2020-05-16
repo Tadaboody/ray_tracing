@@ -1,6 +1,6 @@
 use crate::hit::Hit;
 use crate::ray::Ray;
-use crate::vec3::{Color, Point};
+use crate::vec3::{Color, Point, Vec3};
 
 pub trait Material {
     fn scatter(&self, _ray: &Ray, _hit: Hit) -> Option<(Color, Ray)>;
@@ -27,5 +27,25 @@ impl Material for Lambertian {
                 direction: scatter_direction,
             },
         ))
+    }
+}
+
+pub struct Metal(pub Color);
+impl Metal {
+    fn reflect(vector: &Vec3, normal: &Vec3) -> Vec3 {
+        *vector - ((2. * vector.dot(normal)) * *normal)
+    }
+}
+impl Material for Metal {
+    fn scatter(&self, ray: &Ray, hit: Hit) -> std::option::Option<(Color, Ray)> {
+        let reflection = Metal::reflect(&ray.direction.unit(), &hit.normal);
+        let scatter = Ray {
+            origin: hit.point,
+            direction: reflection,
+        };
+        if scatter.direction.dot(&hit.normal) <= 0. {
+            return None;
+        }
+        Some((self.0, scatter))
     }
 }

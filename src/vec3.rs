@@ -11,6 +11,8 @@ impl Color {
     pub const WHITE: Color = Color::new(1., 1., 1.);
     pub const GRAY: Color = Color::new(0.5, 0.5, 0.5);
     pub const SKY_BLUE: Color = Color::new(0.5, 0.7, 1.0);
+    pub const RED: Color = Color::new(1., 0., 0.);
+    pub const YELLOW: Color = Color::new(0.8, 0.8, 0.8);
 }
 
 impl Vec3 {
