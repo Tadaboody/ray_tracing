@@ -9,30 +9,42 @@ pub struct Sphere {
     pub material: Box<dyn Material>,
 }
 
+// Returns an option matching if the predicate was matched
+fn satisfies<T: Copy>(f: T, pred: fn(T) -> bool) -> Option<T> {
+    if pred(f) {
+        Some(f)
+    } else {
+        None
+    }
+}
+
 impl Hittable for Sphere {
     fn hit(&self, _ray: &Ray) -> Option<(Hit, &dyn Material)> {
         let oc = _ray.origin - self.center;
         let a = _ray.direction.dot(&_ray.direction);
-        let b = 2.0 * oc.dot(&_ray.direction);
+        let b = oc.dot(&_ray.direction);
         let c = oc.dot(&oc) - self.radius * self.radius;
-        let discriminant = (b * b) - (4. * a * c);
+        let discriminant = (b * b) - (a * c);
         if discriminant < 0.0 {
             return None;
         }
-        let dist = (-b - discriminant.sqrt()) / (2. * a);
+        let hit = |num: f32| num > 0.1;
+        let possible_dist = satisfies((-b - discriminant.sqrt()) / a, hit)
+            .or(satisfies(-b + discriminant.sqrt() / a, hit));
+        match possible_dist {
+            Some(dist) => {
+                let point = _ray.at(dist);
 
-        if dist < 0.1 {
-            return None;
+                Some((
+                    Hit {
+                        dist: dist,
+                        point: point,
+                        normal: (point - self.center) / self.radius,
+                    },
+                    self.material.as_ref(),
+                ))
+            }
+            None => None,
         }
-        let point = _ray.at(dist) - self.center;
-
-        Some((
-            Hit {
-                dist: dist,
-                point: point,
-                normal: (point - self.center),
-            },
-            self.material.as_ref(),
-        ))
     }
 }
