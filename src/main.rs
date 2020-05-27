@@ -18,14 +18,14 @@ use indicatif::ProgressBar;
 fn color<T: Hittable>(r: Ray, world: &T, remaining_recursions: u32) -> Color {
     if remaining_recursions <= 0 {
         // No light source found, absorb the light!
-        return Color::BLACK;
+        return Color::GRAY;
     }
 
     if let Some((hit, material)) = world.hit(&r) {
         if let Some((attenuation, scatter)) = material.scatter(&r, hit) {
             attenuation * color(scatter, world, remaining_recursions - 1)
         } else {
-            Vec3::new(0., 0., 0.)
+            Color::GRAY
         }
     } else {
         let unit_direction = r.direction.unit();

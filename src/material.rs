@@ -11,15 +11,24 @@ pub struct Lambertian(pub Color);
 fn random_in_unit_sphere() -> Point {
     loop {
         let p = Point::rand(&mut rand::thread_rng(), -1., 1.);
-        if p.dot(&p) < 1. {
+        if p.length_squared() < 1. {
             return p;
         }
     }
 }
 
+fn random_in_hemisphere(normal: &Vec3) -> Point {
+    let in_unit = random_in_unit_sphere();
+    if in_unit.dot(&normal) > 0. {
+        in_unit
+    } else {
+        -in_unit
+    }
+}
+
 impl Material for Lambertian {
     fn scatter(&self, _ray: &Ray, _hit: Hit) -> Option<(Color, Ray)> {
-        let scatter_direction = _hit.normal + random_in_unit_sphere();
+        let scatter_direction = _hit.normal + random_in_hemisphere(&_hit.normal);
         Some((
             self.0,
             Ray {
